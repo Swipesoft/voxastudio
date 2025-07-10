@@ -38,4 +38,4 @@ Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/bui
 =======
 # voxastudio
 A text-based image photoshop tool 
->>>>>>> f926d9dc20718e053b2770c70ff5dd5b49475b8e
+
