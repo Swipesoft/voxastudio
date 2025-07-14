@@ -23,6 +23,9 @@ export default function cloudinarySignatureHandler(): {
         upload_preset,
     }; 
     const cloud_api_secret = process.env.CLOUDINARY_API_SECRET;
+    if (!cloud_api_secret) {
+        throw new Error("Missing CLOUDINARY_API_SECRET environment variable");
+    }
     // Generate the signature using Cloudinary's API secret
     const signature = cloudinary.utils.api_sign_request(
         signatureParams, 

@@ -16,7 +16,7 @@ export function getRateLimiter() {
     if (process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN) {
         ratelimit = new Ratelimit({
             redis,
-            limiter: Ratelimit.slidingWindow(10, '1 d'), // 10 requests per day
+            limiter: Ratelimit.slidingWindow(50, '1 d'), // 10 requests per day
             analytics: true,
             prefix: 'voxastudio',
         });

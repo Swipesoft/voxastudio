@@ -1,6 +1,6 @@
+
 "use server"; 
 
-import { get } from "http";
 // import util functions from other files 
 import { getAdjustedDimensions } from "./get-adjusted-dimensions";
 import { getTogether } from "./get-together"; 
@@ -26,6 +26,14 @@ const schema = z.object({
 
 }); 
 
+// decalare type for API response 
+type ApiResponse = {
+  index: number;
+  url: string | null;
+  timings: { inference: number } | Record<string, unknown>;
+};
+
+
 // declare image generation function 
 export async function generateImage(
     input: z.infer<typeof schema>, 
@@ -48,7 +56,7 @@ export async function generateImage(
    const adjustedDimensions = getAdjustedDimensions(width, height);
 
    // declare undefined variable for generated image URL 
-   let url; 
+   let url: string | undefined = undefined; 
 
    // revise prompt 
    const finalPrompt = `Edit this image: ${prompt}`;
@@ -62,17 +70,42 @@ export async function generateImage(
         image_url: imageUrl,
     }); 
 
-    url = response.data[0].url;  
-   } catch (e: any) {
-    console.log(e); 
-    if (e.toString().includes("403")) {
-        return {
-            success: false, 
-            error: "Rate limit exceeded. Please try again later or Use your Together API key.",
-        }; 
-    }
+    const item = response.data[0]; 
+    
+    // runtime check + cast
+  if (
+    item &&
+    typeof item === 'object' &&
+    'url' in item &&
+    'timings' in item &&
+    item.timings &&
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    typeof (item as any).timings.inference === 'number') {
+    const response_data = item as ApiResponse;
+    console.log('Response Data:', response_data);
+    url = response_data.url ?? undefined;
+  }
 
-   }
+    
+
+  } catch (e: unknown) {
+  if (typeof e === "string" && e.includes("403")) {
+    return {
+      success: false,
+      error: "Rate limit exceeded. Please try again later or Use your Together API key.",
+    };
+  }
+
+  if (e instanceof Error && e.message.includes("403")) {
+    return {
+      success: false,
+      error: "Rate limit exceeded. Please try again later or Use your Together API key.",
+    };
+  }
+
+  console.log(e);
+}
+
 
    if (url){
     return {

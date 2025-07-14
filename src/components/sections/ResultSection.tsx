@@ -1,8 +1,15 @@
+/* eslint-disable @next/next/no-img-element */
+
 // src/components/ui/ResultSection.jsx
 import React from 'react';
 import { Sparkles, Download, Camera } from 'lucide-react';
+//import Image from 'next/image'; 
 
-export default function ResultSection({ processedImage }) {
+interface ResultSectionProps {
+  processedImage: string | null;
+}
+
+export default function ResultSection({ processedImage }: ResultSectionProps) {
   // Function to handle image download
   const handleDownload = () => {
     if (processedImage) {

@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const file = formData.get("file") as File;
     const prompt = formData.get("prompt") as string;
     const userAPIKey = formData.get("userAPIKey") as string | null;
-    const model = formData.get("model") as string || "black-forest-labs/FLUX.1-schnell";
+    //const model = formData.get("model") as string || "black-forest-labs/FLUX.1-schnell";
 
     // Validate required fields
     if (!file || !prompt) {
@@ -76,25 +76,3 @@ export async function POST(request: NextRequest) {
 
 
 
-export async function GET(req: NextRequest) {
-  const { searchParams } = new URL(req.url);
-  const remote = searchParams.get('url');
-  if (!remote) return NextResponse.json({ error: 'Missing url' }, { status: 400 });
-
-  // 1. Fetch the remote image
-  const r = await fetch(remote, { method: 'GET' });
-  if (!r.ok) return NextResponse.json({ error: 'Not found' }, { status: 404 });
-
-  // 2. Create the response with the same bytes
-  const blob = await r.blob();
-
-  // 3. Force download & mobile-friendly filename
-  const headers = new Headers();
-  headers.set('Content-Type', blob.type);
-  headers.set(
-    'Content-Disposition',
-    'attachment; filename="voxastudio-transformed-image.png"'
-  );
-
-  return new Response(blob, { headers });
-}

@@ -2,7 +2,14 @@
 import React from 'react';
 import { Wand2 } from 'lucide-react';
 
-export default function PromptSection({ prompt, setPrompt, promptSuggestions }) {
+interface PromptSectionProps {
+  prompt: string;
+  setPrompt: (value: string) => void;
+  promptSuggestions: string[];
+}
+
+
+export default function PromptSection({ prompt , setPrompt , promptSuggestions }: PromptSectionProps) {
   return (
     <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
       <h3 className="text-xl font-semibold text-white mb-4 flex items-center">

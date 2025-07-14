@@ -2,7 +2,7 @@
 
 // Import neccessary libraries and packages 
 import React, { useState, useRef } from 'react';
-import { Sparkles, Zap, AlertCircle } from 'lucide-react'; 
+import { Zap, AlertCircle } from 'lucide-react'; 
 
 // Import sections from the components directory 
 import Header from './sections/Header';
@@ -166,7 +166,7 @@ export default function VoxaStudio() {
             className="w-full bg-black/20 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
           />
           <p className="text-sm text-gray-400 mt-2">
-            Without an API key, you'll be limited to 10 requests per day. Get your API key from{' '}
+            Without an API key,you&apos;ll be limited to 10 requests per day. Get your API key from{' '}
             <a href="https://together.ai" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">
               together.ai
             </a>
@@ -182,7 +182,7 @@ export default function VoxaStudio() {
               selectedImage={selectedImage}
               setSelectedImage={setSelectedImage}
               setProcessedImage={setProcessedImage}
-              fileInputRef={fileInputRef}
+              fileInputRef={fileInputRef as React.RefObject<HTMLInputElement>}
               handleImageUpload={handleImageUpload}
               handleDragOver={handleDragOver}
               handleDrop={handleDrop}

@@ -1,6 +1,17 @@
+/* eslint-disable @next/next/no-img-element */
 // src/components/ui/UploadSection.jsx
 import React from 'react';
 import { Upload, FileImage } from 'lucide-react';
+
+interface UploadSectionProps {
+  selectedImage: string | null;
+  setSelectedImage: (image: string | null) => void;
+  setProcessedImage: (image: string | null) => void;
+  fileInputRef: React.RefObject<HTMLInputElement| null>;
+  handleImageUpload: (event: React.ChangeEvent<HTMLInputElement>) => void;
+  handleDragOver: (event: React.DragEvent<HTMLDivElement>) => void;
+  handleDrop: (event: React.DragEvent<HTMLDivElement>) => void;
+}
 
 export default function UploadSection({
   selectedImage,
@@ -10,7 +21,7 @@ export default function UploadSection({
   handleImageUpload,
   handleDragOver,
   handleDrop,
-}) {
+}: UploadSectionProps ) {
   return (
     <div className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
       <h3 className="text-xl font-semibold text-white mb-4 flex items-center">
