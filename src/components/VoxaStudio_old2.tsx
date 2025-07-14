@@ -2,11 +2,11 @@
 
 // Import neccessary libraries and packages 
 import React, { useState, useRef } from 'react';
-import { Sparkles, Zap, AlertCircle } from 'lucide-react'; 
+import {Sparkles, Zap} from 'lucide-react'; 
 
 // Import sections from the components directory 
 import Header from './sections/Header';
-import HeroSection from './sections/HeroSection';
+import HeroSection  from './sections/HeroSection';
 import FeaturesSection from './sections/FeaturesSelection';
 import PromptSection from './sections/PromptSection';
 import ResultSection from './sections/ResultSection';   
@@ -16,106 +16,93 @@ import Footer from './sections/Footer';
 // Main component for VoxaStudio 
 export default function VoxaStudio() {
   // State variables for image handling and processing
-  const [selectedImage, setSelectedImage] = useState<string | null>(null);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [selectedImage, setSelectedImage] = useState(null);
   const [prompt, setPrompt] = useState('');
   const [isProcessing, setIsProcessing] = useState(false);
-  const [processedImage, setProcessedImage] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
-  const [userAPIKey, setUserAPIKey] = useState<string>('');
+  const [processedImage, setProcessedImage] = useState(null);
 
   // Ref for the hidden file input element
-  const fileInputRef = useRef<HTMLInputElement>(null);
+  const fileInputRef = useRef(null);
 
   /**
    * Handles the image file selection from the input.
    * Reads the file as a Data URL and sets it as the selected image.
    * Resets the processed image state.
+   * @param {Event} event - The change event from the file input.
    */
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const handleImageUpload = (event) => {
+    const file = event.target.files[0];
     if (file) {
-      setSelectedFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
-        setSelectedImage(e.target?.result as string);
-        setProcessedImage(null);
-        setError(null);
+        setSelectedImage(e.target.result);
+        setProcessedImage(null); // Clear processed image when a new one is uploaded
       };
       reader.readAsDataURL(file);
     }
   };
 
   /**
-   * Processes the image using the API endpoint.
-   * Uploads the image and prompt to the backend for AI processing.
+   * Simulates the image processing. In a real application, this would
+   * involve making an API call to an AI model.
+   * Sets processing state, simulates delay, then sets a processed image.
    */
   const handleProcess = async () => {
-    // Prevent processing if no file is selected or prompt is empty
-    if (!selectedFile || !prompt.trim()) {
-      setError("Please select an image and enter a prompt.");
+    // Prevent processing if no image is selected or prompt is empty
+    if (!selectedImage || !prompt.trim()) {
+      console.log("Please select an image and enter a prompt.");
       return;
     }
 
-    setIsProcessing(true);
-    setError(null);
+    setIsProcessing(true); // Set processing state to true
 
     try {
-      // Create FormData to send file and prompt
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-      formData.append('prompt', prompt);
-      if (userAPIKey.trim()) {
-        formData.append('userAPIKey', userAPIKey);
-      }
+      // Placeholder for actual API call to your AI model
+      // Example:
+      // const response = await fetch('/api/process-image', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify({ image: selectedImage, prompt: prompt })
+      // });
+      // const data = await response.json();
+      // setProcessedImage(data.processedImageUrl);
 
-      // Make API call to process the image
-      const response = await fetch('/api/process-image', {
-        method: 'POST',
-        body: formData,
-      });
+      // Simulate a network request delay
+      await new Promise(resolve => setTimeout(resolve, 3000));
 
-      const data = await response.json();
-
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to process image');
-      }
-
-      if (data.success) {
-        setProcessedImage(data.processedImageUrl);
-      } else {
-        throw new Error(data.error || 'Failed to process image');
-      }
+      // For demonstration, just set the processed image to the selected image
+      // Replace this with the actual image returned from your AI model
+      setProcessedImage(selectedImage);
 
     } catch (error) {
       console.error("Error processing image:", error);
-      setError(error instanceof Error ? error.message : "An unknown error occurred");
+      // You might want to show an error message to the user here
     } finally {
-      setIsProcessing(false);
+      setIsProcessing(false); // Reset processing state
     }
   };
 
   /**
    * Prevents default drag-over behavior to allow dropping.
+   * @param {Event} e - The drag event.
    */
-  const handleDragOver = (e: React.DragEvent) => {
+  const handleDragOver = (e) => {
     e.preventDefault();
   };
 
   /**
    * Handles image file drop events.
    * Reads the dropped file as a Data URL if it's an image.
+   * @param {Event} e - The drop event.
    */
-  const handleDrop = (e: React.DragEvent) => {
+  const handleDrop = (e) => {
     e.preventDefault();
     const file = e.dataTransfer.files[0];
     if (file && file.type.startsWith('image/')) {
-      setSelectedFile(file);
       const reader = new FileReader();
       reader.onload = (e) => {
-        setSelectedImage(e.target?.result as string);
-        setProcessedImage(null);
-        setError(null);
+        setSelectedImage(e.target.result);
+        setProcessedImage(null); // Clear processed image when a new one is dropped
       };
       reader.readAsDataURL(file);
     }
@@ -147,32 +134,6 @@ export default function VoxaStudio() {
         {/* Hero Section Component */}
         <HeroSection />
 
-        {/* Error Display */}
-        {error && (
-          <div className="mb-6 bg-red-500/10 border border-red-500/20 rounded-xl p-4 flex items-center space-x-2">
-            <AlertCircle className="w-5 h-5 text-red-400" />
-            <span className="text-red-400">{error}</span>
-          </div>
-        )}
-
-        {/* API Key Input */}
-        <div className="mb-6 bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10">
-          <h3 className="text-lg font-semibold text-white mb-3">API Configuration (Optional)</h3>
-          <input
-            type="password"
-            value={userAPIKey}
-            onChange={(e) => setUserAPIKey(e.target.value)}
-            placeholder="Enter your Together AI API key (optional - for higher limits)"
-            className="w-full bg-black/20 border border-white/20 rounded-xl px-4 py-3 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
-          />
-          <p className="text-sm text-gray-400 mt-2">
-            Without an API key, you'll be limited to 10 requests per day. Get your API key from{' '}
-            <a href="https://together.ai" target="_blank" rel="noopener noreferrer" className="text-purple-400 hover:text-purple-300">
-              together.ai
-            </a>
-          </p>
-        </div>
-
         {/* Main Interface Grid */}
         <div className="grid lg:grid-cols-2 gap-8 mb-12">
           {/* Left Column: Upload and Prompt Sections */}
@@ -198,7 +159,7 @@ export default function VoxaStudio() {
             {/* Process Button */}
             <button
               onClick={handleProcess}
-              disabled={!selectedFile || !prompt.trim() || isProcessing}
+              disabled={!selectedImage || !prompt.trim() || isProcessing}
               className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 disabled:from-gray-600 disabled:to-gray-600 text-white font-semibold py-4 px-6 rounded-xl flex items-center justify-center space-x-2 transition-all duration-200 transform hover:scale-105 disabled:scale-100 disabled:cursor-not-allowed"
             >
               {isProcessing ? (
@@ -231,3 +192,4 @@ export default function VoxaStudio() {
     </div>
   );
 }
+

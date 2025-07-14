@@ -6,9 +6,11 @@ export default function ResultSection({ processedImage }) {
   // Function to handle image download
   const handleDownload = () => {
     if (processedImage) {
+      // Build same-origin download URL
+      const downloadUrl = `/api/download-image?url=${encodeURIComponent(processedImage)}`;
       const link = document.createElement('a');
-      link.href = processedImage;
-      link.download = 'voxastudio-transformed-image.png'; // You can make this dynamic
+      link.href = downloadUrl; //processedImage;
+      link.download = 'voxastudio-transformed-image.png'; // You can make this a dynamic hint for desktop
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);

@@ -34,7 +34,6 @@ export async function generateImage(
    
    if (ratelimit && !userAPIKey) {
     const ipAddress = await getIPAddress();
-
     const {success} = await ratelimit.limit(ipAddress); 
     if (!success) {
         return {
@@ -46,5 +45,45 @@ export async function generateImage(
    }
 
    const together  = getTogether(userAPIKey); 
+   const adjustedDimensions = getAdjustedDimensions(width, height);
+
+   // declare undefined variable for generated image URL 
+   let url; 
+
+   // revise prompt 
+   const finalPrompt = `Edit this image: ${prompt}`;
+   // try generating image using Together API
+   try {
+    const response = await together.images.create({
+        model, 
+        prompt: finalPrompt, 
+        width: adjustedDimensions.width,
+        height: adjustedDimensions.height,
+        image_url: imageUrl,
+    }); 
+
+    url = response.data[0].url;  
+   } catch (e: any) {
+    console.log(e); 
+    if (e.toString().includes("403")) {
+        return {
+            success: false, 
+            error: "Rate limit exceeded. Please try again later or Use your Together API key.",
+        }; 
+    }
+
+   }
+
+   if (url){
+    return {
+        success: true, 
+        url
+    };  
+   } else {
+    return {
+        success: false, 
+        error: "Image generation failed. Please try again later.",
+    }; 
+   }
 
 }

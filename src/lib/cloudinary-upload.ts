@@ -22,14 +22,18 @@ export default async function handleCloudinaryUpload(file: File): Promise<Cloudi
   formData.append("timestamp", timestamp.toString());
   formData.append("folder", folder);
   formData.append("upload_preset", upload_preset);
+  formData.append("api_key", process.env.CLOUDINARY_API_KEY || "");
 
-  const response = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+  const endpoint = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+  const response = await fetch(endpoint, {
     method: "POST",
     body: formData,
   });
 
   const data = await response.json();
+  console.log("API Key:", process.env.CLOUDINARY_API_KEY);
 
+  console.log(data); 
   if (!data.secure_url) {
     throw new Error("Upload failed");
   }
@@ -40,6 +44,6 @@ export default async function handleCloudinaryUpload(file: File): Promise<Cloudi
           height: data.height
   }; 
 
-  
+
   return result; 
 }

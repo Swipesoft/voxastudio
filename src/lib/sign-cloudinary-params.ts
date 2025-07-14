@@ -1,5 +1,5 @@
 import {v2 as cloudinary} from 'cloudinary';
-import { time } from 'console';
+//import { time } from 'console';
 
 cloudinary.config({
     cloud_name: process.env.CLOUDINARY_CLOUD_NAME || '',
@@ -16,17 +16,20 @@ export default function cloudinarySignatureHandler(): {
     // get timestamp for signature 
     const  timestamp = Math.round(new Date().getTime() / 1000);
     const folder: string = 'voxastudio-images';
-    const upload_preset: string = 'secure_preset';  //required for unsigned uploads
+    const upload_preset: string ='ml_default'; // 'secure_preset';  //required for unsigned uploads
     const signatureParams = { 
         timestamp,
         folder, 
-        upload_preset
+        upload_preset,
     }; 
+    const cloud_api_secret = process.env.CLOUDINARY_API_SECRET;
     // Generate the signature using Cloudinary's API secret
     const signature = cloudinary.utils.api_sign_request(
         signatureParams, 
-        process.env.CLOUDINARY_API_SECRET 
+        cloud_api_secret,
     );
+
+    console.log("generated Cloudinary Signature:", signature);
 
     return { signature, timestamp, folder, upload_preset };
 }   
